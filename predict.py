@@ -10,22 +10,14 @@ from csvParsers import preAmex, preCapitolOne, preFinances
 
 ####Check if the same tuple exists in finances list or that the value && description are the same
 def checkDuplicateEntry(financesList, entry):
-        ### finances(value,location,label)
-        ### entry(value,location, description)
-        print (entry, 'entry')
-        print (financesList[0],'financesList')
-        if entry in financesList:
-            print (entry, 'might be a duplicate')
-        # else:
-        #     for value in financesList:
-        #         if value[0] == entry[0] and value[2] == entry[2]:
-                    # print (entry, 'might be a duplicate')
-
-####Training List in (value,location, label) format
+        for value in financesList:
+            if value[0] == entry[0] and value[1] == entry[1] and value[2] == entry[2] and value[3] == value [3]:
+                print(value[2], value[2])
+####Training List in (date, value,location, label) format
 
 def trainData(trainingList):
-    locationList = [a[1] for a in trainingList]
-    labelsList = [a[2] for a in trainingList]
+    locationList = [a[2] for a in trainingList]
+    labelsList = [a[3] for a in trainingList]
 
     vectorizer = CountVectorizer()
     vectorizerArray = vectorizer.fit(locationList)
@@ -58,7 +50,7 @@ def addTransactions(transactionList, financesList):
         description = clf.predict(vectorizer.transform([location]).toarray())[0]
 
         ###Check if entry might be duplicate
-        checkDuplicateEntry(financesList, (value,location,description))
+        checkDuplicateEntry(financesList, (date,value,location,description))
 
         ##Append To List
         rtrnList.append((date,value,description,location))

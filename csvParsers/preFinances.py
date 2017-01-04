@@ -13,12 +13,14 @@ class financesCSV(object):
             elif rowList[4]:
                 value = rowList[4]
             return value
+
     def splitRow(self,row):
         rowList = row.split(',')
+        date = rowList[0]
         value = float(self.getValue(rowList))
         location = rowList[6]
         label = rowList[5]
-        return (value, location, label)
+        return (date, value, location, label)
 
     def readFile(self):
         fileList = []
