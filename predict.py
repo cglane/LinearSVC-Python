@@ -9,10 +9,12 @@ from sklearn import svm
 from csvParsers import preAmex, preCapitolOne, preFinances
 
 ####Check if the same tuple exists in finances list or that the value && description are the same
-def checkDuplicateEntry(financesList, entry):
+def isDuplicateEntry(financesList, entry):
         for value in financesList:
             if value[0] == entry[0] and value[1] == entry[1] and value[2] == entry[2] and value[3] == value [3]:
-                print(value[2], value[2])
+                print("Probable Duplicate Value, removed from write: ", value)
+                return True
+
 ####Training List in (date, value,location, label) format
 
 def trainData(trainingList):
@@ -50,10 +52,10 @@ def addTransactions(transactionList, financesList):
         description = clf.predict(vectorizer.transform([location]).toarray())[0]
 
         ###Check if entry might be duplicate
-        checkDuplicateEntry(financesList, (date,value,location,description))
+        if isDuplicateEntry(financesList, (date,value,location,description)) is None:
+                ##Append To List
+            rtrnList.append((date,value,description,location))
 
-        ##Append To List
-        rtrnList.append((date,value,description,location))
 
     return rtrnList
 

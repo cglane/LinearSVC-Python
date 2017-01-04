@@ -20,7 +20,7 @@ class amexCSV(object):
         ##Adding negative sign to value
         value =  self.getValue(rowList)
         ##Get third item, only text before '-' and not including the "
-        location = rowList[2].split('-')[0][1:]
+        location = rowList[2].split(' -')[0][1:]
         if location != 'ONLINE PAYMENT ':
             return (date,value,location)
 

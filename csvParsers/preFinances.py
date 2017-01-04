@@ -18,7 +18,7 @@ class financesCSV(object):
         rowList = row.split(',')
         date = rowList[0]
         value = float(self.getValue(rowList))
-        location = rowList[6]
+        location = rowList[6].split('\n')[0]
         label = rowList[5]
         return (date, value, location, label)
 
@@ -28,7 +28,7 @@ class financesCSV(object):
             with open(self.fileName,'rb') as csvfile:
                 for row in csvfile:
                     fileList.append(self.splitRow(row))
-            return fileList
+                return fileList
         except Exception as e:
-            print ['Error has occured with file']
+            print (e,'Error has occured with preFinance')
             return []
