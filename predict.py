@@ -2,24 +2,27 @@ import pickle
 import cPickle
 import numpy as np
 import csv
-
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.svm import LinearSVC
 from sklearn import svm
 from csvParsers import preAmex, preCapitolOne, preFinances
 
+from datetime import datetime
+
+def get_date(record):
+    return datetime.strptime(record[0], "%m/%d/%Y")
+
 ####Check if the same tuple exists in finances list or that the value && description are the same
-def isDuplicateEntry(financesList, entry):
-        for value in financesList:
-            if value[0] == entry[0] and value[1] == entry[1] and value[2] == entry[2] and value[3] == value [3]:
-                print("Probable Duplicate Value, removed from write: ", value)
-                return True
+def isDuplicateEntry(financesTuples, entry):
+        if entry in financesTuples:
+            print (entry, 'Duplicate entry not added')
+            return True
 
 ####Training List in (date, value,location, label) format
 
 def trainData(trainingList):
-    locationList = [a[2] for a in trainingList]
-    labelsList = [a[3] for a in trainingList]
+    locationList = trainingList['locations']
+    labelsList = trainingList['labels']
 
     vectorizer = CountVectorizer()
     vectorizerArray = vectorizer.fit(locationList)
@@ -35,33 +38,34 @@ def trainData(trainingList):
 ###Using the LinearSVC make a prediction about the description of the transaction
 ###returning a list of transactions with descriptions
 
-def addTransactions(transactionList, financesList):
+def addTransactions(transactionList, financesList, excludedLocations = ['ONLINE PAYMENT']):
     rtrnList = []
 
     print 'Training Data'
-
     vectorizer, clf = trainData(financesList)
 
     ###Transaction List is list of tuples (date, value, location)
-
+    financesTuples = [tuple(x) for x in zip(financesList['dates'],financesList['values'],financesList['locations'])]
     for item in transactionList:
         date = item[0]
         value = item[1]
         location = item[2]
         ###Make a prediction for the description
         description = clf.predict(vectorizer.transform([location]).toarray())[0]
-
         ###Check if entry might be duplicate
-        if isDuplicateEntry(financesList, (date,value,location,description)) is None:
-                ##Append To List
+        if isDuplicateEntry(financesTuples, (date,float(value),location)):
+            pass
+                #Append To List
+        if location not in excludedLocations:
             rtrnList.append((date,value,description,location))
-
 
     return rtrnList
 
 ##### Write the completed list to the csv file output
 
 def writeToCSV(outputName,transactions):
+    transactions = sorted(transactions, key=get_date, reverse=False)
+
     with open(outputName , "wb") as outcsv:
         writer = csv.writer(outcsv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL, lineterminator='\n')
         for item in transactions:
